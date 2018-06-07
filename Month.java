@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Month {
 	private Day[] days;
 	
-	public Month(String firstDay, int lastDay) {
+	public Month(String firstDay, int numFirstDay, int lastDay) {
 		int correction;
 		//initialize day 0 of the month to null to make the array slots correspond to 
 		//actual day numbers
