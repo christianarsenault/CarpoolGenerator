@@ -34,4 +34,23 @@ public class IO {
         return allWorkers;
     }
 	
+	public static void writeToCsv(String s) {
+		FileWriter fw;
+        BufferedWriter bw;
+        //try/catch checked errors for reading files
+        try{
+        	fw = new FileWriter("Schedule.csv",true);
+            bw = new BufferedWriter(fw);
+            
+            bw.write(s);
+            bw.flush();
+            bw.close();
+        //catching checked errors with appropriate error messages   
+        }catch(FileNotFoundException e){
+            System.out.println("Error, cannot find file");
+        }catch(IOException exc){
+            System.out.println("Error with file");
+        }
+	}
+	
 }

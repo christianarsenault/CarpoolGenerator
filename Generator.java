@@ -69,19 +69,29 @@ public class Generator {
 			p.incrementPriority();
 			
 			if(p.getCanDrive()) {
-				todaysDrivers += "Driver: " + p.getName() + System.lineSeparator();
+				todaysDrivers += p.getName() + " (Driver)" + System.lineSeparator();
 				carSeats += p.getCapacity();
+				
+				IO.writeToCsv(p.getName() + " (Driver),");
 			}else {
 				driver = substituteDriver(pq);
 				pq.remove(driver);
 				carSeats += driver.getCapacity();
-				todaysDrivers += p.getName() + " will pay " + driver.getName() + " to drive. " + System.lineSeparator();
+				todaysDrivers += driver.getName() + " (Paid Driver)" + System.lineSeparator() + p.getName() + " (Pay " + driver.getName() + ")" + System.lineSeparator();
+				
+				IO.writeToCsv(driver.getName() + " (Paid Driver),");
+				IO.writeToCsv(p.getName() + " (Pay " + driver.getName() + "),");
 			}
 		}
 		//print the remaining workers scheduled that day
 		while(!pq.isEmpty()) {
 			p = pq.remove();
 			todaysDrivers += p.getName() + System.lineSeparator();
+			if(!pq.isEmpty()) {
+				IO.writeToCsv(p.getName() + ",");
+			}else {
+				IO.writeToCsv(p.getName() + System.lineSeparator());
+			}
 		}
 		return todaysDrivers;	
 	}
