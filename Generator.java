@@ -23,8 +23,11 @@ public class Generator {
 		sc.nextLine();
 		System.out.println("Enter the number of days in the month");
 		int numDays = sc.nextInt();
+		System.out.println("Enter 'true' if you would like table format, 'false' otherwise");
+		boolean toTable = sc.nextBoolean();
 		int k=0;
 		sc.nextLine();
+		
 		
 		Month currMonth = new Month(firstDay,numFirstDay, numDays);
 		ArrayList<Person> currDayWorkers = new ArrayList<Person>();
@@ -36,7 +39,8 @@ public class Generator {
 			}
 			//add people that work that day to the currDayWorkers
 			for(Person worker : allPeople) {
-				if(worker.getWorkDays().contains(d.getName())) {
+				//if the worker is supposed to work that day, and doesn't have the day off then they work
+				if(worker.getWorkDays().contains(d.getName()) && !(worker.getDaysOff().contains(d.getDate()))) {
 					currDayWorkers.add(worker);
 				}
 			}
@@ -46,17 +50,38 @@ public class Generator {
 			d.setWorkers(currDayWorkers);
 			
 			//**change this to output to csv file**
-			System.out.println(determineDrivers(d));
+			
+			if(d.getName().equals("S")) {
+				System.out.println(determineDrivers(d,toTable));
+			}else {
+				System.out.print(determineDrivers(d,toTable));
+			}
+			
 			//clear list for next use
 			currDayWorkers.clear();
+			
+			
 		}
 		sc.close();
+		//here we output a ratio of driver:passenger for each person to verify
+		//everyone drives a fair amount
+		
+		for(Person q : allPeople) {
+			System.out.println(q.getName() + ":   " + q.getDaysDriven() + ":" + q.getDaysPassenger());
+		}
+		
 	}
 	
 	
 	
-	public static String determineDrivers(Day currDay) {
-		String todaysDrivers = currDay.getName() + " the " + currDay.getDate() + ": " + System.lineSeparator();
+	public static String determineDrivers(Day currDay, Boolean toTable) {
+		String todaysDrivers;
+		if(toTable) {
+			todaysDrivers = currDay.getSpelledOutName() + " the " + currDay.getDate() + ":,";
+		}else {
+			todaysDrivers = currDay.getSpelledOutName() + " the " + currDay.getDate() + ": " + System.lineSeparator();
+		}
+		
 		int carSeats = 0;
 		PriorityQueue<Person> pq = new PriorityQueue<Person>(currDay.getWorkers());
 		
@@ -69,29 +94,42 @@ public class Generator {
 			p.incrementPriority();
 			
 			if(p.getCanDrive()) {
-				todaysDrivers += p.getName() + " (Driver)" + System.lineSeparator();
+				if(toTable) {
+					todaysDrivers += p.getName() + " (Driver),";
+				}else {
+					todaysDrivers += p.getName() + " (Driver)" + System.lineSeparator();
+				}
 				carSeats += p.getCapacity();
+				p.incrementDaysDriven();
 				
-				IO.writeToCsv(p.getName() + " (Driver),");
 			}else {
 				driver = substituteDriver(pq);
 				pq.remove(driver);
 				carSeats += driver.getCapacity();
-				todaysDrivers += driver.getName() + " (Paid Driver)" + System.lineSeparator() + p.getName() + " (Pay " + driver.getName() + ")" + System.lineSeparator();
+				if(toTable) {
+					todaysDrivers += driver.getName() + " (Paid Driver)," + p.getName() + " (Pay " + driver.getName() + "),";
+				}else {
+					todaysDrivers += driver.getName() + " (Paid Driver)" + System.lineSeparator() + p.getName() + " (Pay " + driver.getName() + ")" + System.lineSeparator();
+				}
 				
-				IO.writeToCsv(driver.getName() + " (Paid Driver),");
-				IO.writeToCsv(p.getName() + " (Pay " + driver.getName() + "),");
+				driver.incrementDaysPassenger();
+				p.incrementDaysDriven();
+				
 			}
 		}
 		//print the remaining workers scheduled that day
 		while(!pq.isEmpty()) {
 			p = pq.remove();
-			todaysDrivers += p.getName() + System.lineSeparator();
-			if(!pq.isEmpty()) {
-				IO.writeToCsv(p.getName() + ",");
+			if(toTable) {
+				todaysDrivers += p.getName() + ",";
 			}else {
-				IO.writeToCsv(p.getName() + System.lineSeparator());
+				todaysDrivers += p.getName() + System.lineSeparator();
 			}
+			if(toTable && pq.isEmpty()) {
+				todaysDrivers += "-";
+			}
+			
+			p.setDaysPassenger(p.getDaysPassenger() + 1);
 		}
 		return todaysDrivers;	
 	}
@@ -109,7 +147,10 @@ public class Generator {
 		returnMe.setCanDrive(false);
 		while(returnMe.getCanDrive() == false) {
 			returnMe = potentialDrivers.remove(rand);
-			rand = rng.nextInt(potentialDrivers.size());					
+			if(potentialDrivers.size()>0) {
+				rand = rng.nextInt(potentialDrivers.size());
+			}
+								
 		}
 		return returnMe;
 	}

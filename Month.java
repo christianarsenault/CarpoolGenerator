@@ -45,18 +45,25 @@ public class Month {
 			this.days[j].setDate(j);
 			switch((j+correction)%7) {
 				case 0: this.days[j].setName("M");
+						this.days[j].setSpelledOutName("Monday");
 						break;
 				case 1: this.days[j].setName("T");
+						this.days[j].setSpelledOutName("Tuesday");
 						break;
 				case 2: this.days[j].setName("W");
+						this.days[j].setSpelledOutName("Wednesday");
 						break;
 				case 3: this.days[j].setName("thur");
+						this.days[j].setSpelledOutName("Thursday");
 						break;
 				case 4: this.days[j].setName("F");
+						this.days[j].setSpelledOutName("Friday");
 						break;
 				case 5: this.days[j].setName("S");
+						this.days[j].setSpelledOutName("Saturday");
 						break;
 				case 6: this.days[j].setName("sun");
+						this.days[j].setSpelledOutName("Sunday");
 						break;
 			}
 		

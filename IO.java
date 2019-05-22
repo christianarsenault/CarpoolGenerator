@@ -8,22 +8,32 @@ public class IO {
         FileReader fr;
         BufferedReader br;
         String currLine = "";
-        String [] currPerson = new String [4];
+        ArrayList<String> currPerson = new ArrayList<String>();
         ArrayList<Person> allWorkers = new ArrayList<Person>();
+        ArrayList<Integer> currPersonDaysOff = new ArrayList<Integer>();
+ 
         boolean canDrive = false;
         //try/catch checked errors for reading files
         try{
         	fr = new FileReader(filename);
             br = new BufferedReader(fr);
-            while( (currLine = br.readLine()) != null) {
-            	currPerson = currLine.split(",");
-            	if(currPerson[1].equals("y")) {
+            while((currLine = br.readLine()) != null) {
+            	for(String s : (currLine.split(","))){
+            		currPerson.add(currPerson.size(), s);
+            	}
+            	if(currPerson.size()>=4){
+            		for(int i=4;i<currPerson.size();i++) {
+            			currPersonDaysOff.add(Integer.parseInt(currPerson.get(i)));
+            		}
+            	}
+            	if(currPerson.contains("y")) {
             		canDrive = true;
             	}else {
             		canDrive = false;
             	}
-            	allWorkers.add(new Person(currPerson[0],canDrive,Integer.parseInt(currPerson[2]),0, currPerson[3]));
-            	currPerson = null;
+            	allWorkers.add(new Person(currPerson.get(0),canDrive,Integer.parseInt(currPerson.get(2)),0, currPerson.get(3),currPersonDaysOff));
+            	currPerson.clear();
+            	currPersonDaysOff = new ArrayList<Integer>();
             }
         //catching checked errors with appropriate error messages   
         }catch(FileNotFoundException e){

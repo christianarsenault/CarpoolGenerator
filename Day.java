@@ -5,7 +5,11 @@ public class Day {
 	private String name;
 	private ArrayList<Person> workers;
 	private int date;
+	private String spelledOutName;
 	
+	
+
+
 	//constructor if no params passed
 	public Day() {
 		super();
@@ -45,6 +49,15 @@ public class Day {
 
 	public void setDate(int date) {
 		this.date = date;
+	}
+	
+	public String getSpelledOutName() {
+		return spelledOutName;
+	}
+
+
+	public void setSpelledOutName(String spelledOutName) {
+		this.spelledOutName = spelledOutName;
 	}
 
 
